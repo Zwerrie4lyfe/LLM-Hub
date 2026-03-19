@@ -3461,6 +3461,42 @@ inferenceService.loadModel(currentModel!!, _selectedBackend.value, _selectedNpuD
     }
 
     /**
+     * Edit an assistant response in-place so subsequent turns use the updated text in context.
+     */
+    fun editAssistantResponse(messageId: String, newResponseText: String) {
+        val chatId = currentChatId ?: return
+        val trimmed = newResponseText.trim()
+        if (trimmed.isEmpty()) return
+
+        viewModelScope.launch {
+            if (_isLoading.value || _isLoadingModel.value) {
+                return@launch
+            }
+
+            val currentMessages = _messages.value
+            val target = currentMessages.firstOrNull {
+                it.id == messageId && !it.isFromUser && it.chatId == chatId
+            } ?: run {
+                Log.w("ChatViewModel", "Cannot edit assistant response; message not found: $messageId")
+                return@launch
+            }
+
+            if (target.content == trimmed) {
+                return@launch
+            }
+
+            repository.updateMessageContent(messageId, trimmed)
+            _messages.value = currentMessages.map { message ->
+                if (message.id == messageId) {
+                    message.copy(content = trimmed)
+                } else {
+                    message
+                }
+            }
+        }
+    }
+
+    /**
      * Edit the last user message content and resend from that point, replacing subsequent messages.
      */
     fun editLastUserMessageAndResend(context: Context, newUserText: String) {

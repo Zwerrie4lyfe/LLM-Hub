@@ -374,6 +374,11 @@ fun ChatScreen(
                                     // Do not clear focus; MessageInput will request focus and open keyboard
                                 }
                             } else null,
+                            onEditAssistantMessage = if (!message.isFromUser && !isLoading && !isLoadingModel && streamingText.isEmpty() && message.content != "…") {
+                                { updatedText ->
+                                    viewModel.editAssistantResponse(message.id, updatedText)
+                                }
+                            } else null,
                             onTtsSpeak = if (!message.isFromUser && message.content.isNotBlank()) {
                                 { text ->
                                     // Manual TTS button - use local manual ID and ask ViewModel

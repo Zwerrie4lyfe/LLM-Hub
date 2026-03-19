@@ -524,11 +524,14 @@ fun MessageBubble(
     streamingContent: String = "",
     onRegenerateResponse: (() -> Unit)? = null,
     onEditUserMessage: (() -> Unit)? = null,
+    onEditAssistantMessage: ((String) -> Unit)? = null,
     onTtsSpeak: ((String) -> Unit)? = null,
     onTtsStop: (() -> Unit)? = null,
     isTtsSpeaking: Boolean = false
 ) {
     var showFullScreenImage by remember { mutableStateOf(false) }
+    var isEditingAssistantMessage by remember(message.id) { mutableStateOf(false) }
+    var editedAssistantText by remember(message.id) { mutableStateOf("") }
     val context = LocalContext.current
     val isUser = message.isFromUser
     
@@ -736,60 +739,111 @@ fun MessageBubble(
                             }
                         }
                         Column(modifier = Modifier.fillMaxWidth()) {
-                            if (hasThinking) {
-                                val estimatedTokens = (thinkingPart.length / 4).coerceAtLeast(1)
-                                val label = if (thinkingExpanded) {
-                                    "▼ ${stringResource(R.string.thinking_label)}"
-                                } else {
-                                    "▶ ${stringResource(R.string.thinking_tokens, estimatedTokens)}"
-                                }
-                                Surface(
+                            if (isEditingAssistantMessage) {
+                                OutlinedTextField(
+                                    value = editedAssistantText,
+                                    onValueChange = { editedAssistantText = it },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    minLines = 3,
+                                    maxLines = 12
+                                )
+                                Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .clickable { thinkingExpanded = !thinkingExpanded },
-                                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                                    shape = RoundedCornerShape(8.dp)
+                                        .padding(top = 8.dp),
+                                    horizontalArrangement = Arrangement.End,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Column(
-                                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+                                    IconButton(
+                                        onClick = {
+                                            isEditingAssistantMessage = false
+                                            editedAssistantText = ""
+                                        },
+                                        modifier = Modifier.size(32.dp)
                                     ) {
-                                        Text(
-                                            text = label,
-                                            style = MaterialTheme.typography.labelMedium,
-                                            color = MaterialTheme.colorScheme.primary
+                                        Icon(
+                                            Icons.Default.Close,
+                                            contentDescription = stringResource(R.string.cancel),
+                                            modifier = Modifier.size(16.dp),
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
-                                        if (thinkingExpanded) {
-                                            Spacer(modifier = Modifier.height(6.dp))
-                                            RenderMessageSegments(
-                                                displayContent = thinkingPart,
-                                                isUser = false,
-                                                baseColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                linkColor = MaterialTheme.colorScheme.primary,
-                                                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                                                modifier = Modifier.fillMaxWidth()
-                                            )
-                                        }
+                                    }
+                                    IconButton(
+                                        onClick = {
+                                            val trimmed = editedAssistantText.trim()
+                                            if (trimmed.isNotEmpty()) {
+                                                onEditAssistantMessage?.invoke(trimmed)
+                                                isEditingAssistantMessage = false
+                                                editedAssistantText = ""
+                                            }
+                                        },
+                                        enabled = editedAssistantText.trim().isNotEmpty(),
+                                        modifier = Modifier.size(32.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Check,
+                                            contentDescription = stringResource(R.string.save),
+                                            modifier = Modifier.size(16.dp),
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
                                     }
                                 }
-                                if (hasAnswer || hasThinking) Spacer(modifier = Modifier.height(8.dp))
-                            }
-                            if (hasAnswer || !hasThinking) {
-                                val mainContent = if (hasAnswer) answerPart else displayContent
-                                RenderMessageSegments(
-                                    displayContent = mainContent,
-                                    isUser = false,
-                                    baseColor = MaterialTheme.colorScheme.onSurface,
-                                    linkColor = MaterialTheme.colorScheme.primary,
-                                    fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
+                            } else {
+                                if (hasThinking) {
+                                    val estimatedTokens = (thinkingPart.length / 4).coerceAtLeast(1)
+                                    val label = if (thinkingExpanded) {
+                                        "▼ ${stringResource(R.string.thinking_label)}"
+                                    } else {
+                                        "▶ ${stringResource(R.string.thinking_tokens, estimatedTokens)}"
+                                    }
+                                    Surface(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable { thinkingExpanded = !thinkingExpanded },
+                                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                        shape = RoundedCornerShape(8.dp)
+                                    ) {
+                                        Column(
+                                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+                                        ) {
+                                            Text(
+                                                text = label,
+                                                style = MaterialTheme.typography.labelMedium,
+                                                color = MaterialTheme.colorScheme.primary
+                                            )
+                                            if (thinkingExpanded) {
+                                                Spacer(modifier = Modifier.height(6.dp))
+                                                RenderMessageSegments(
+                                                    displayContent = thinkingPart,
+                                                    isUser = false,
+                                                    baseColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                    linkColor = MaterialTheme.colorScheme.primary,
+                                                    fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                                                    modifier = Modifier.fillMaxWidth()
+                                                )
+                                            }
+                                        }
+                                    }
+                                    if (hasAnswer || hasThinking) Spacer(modifier = Modifier.height(8.dp))
+                                }
+                                if (hasAnswer || !hasThinking) {
+                                    val mainContent = if (hasAnswer) answerPart else displayContent
+                                    RenderMessageSegments(
+                                        displayContent = mainContent,
+                                        isUser = false,
+                                        baseColor = MaterialTheme.colorScheme.onSurface,
+                                        linkColor = MaterialTheme.colorScheme.primary,
+                                        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                }
                             }
                         }
                     }
                 }
                 
                 // Action buttons row for AI messages
-                if (message.content != "…" && (message.content.isNotEmpty() || streamingContent.isNotEmpty())) {
+                if (!isEditingAssistantMessage && message.content != "…" && (message.content.isNotEmpty() || streamingContent.isNotEmpty())) {
                     val displayContentForActions = if (streamingContent.isNotEmpty()) streamingContent else message.content
                     val (_, answerForActions) = parseThinkingAndAnswer(displayContentForActions)
                     val contentToCopyOrRead = if (answerForActions.isNotEmpty()) answerForActions else displayContentForActions
@@ -836,6 +890,24 @@ fun MessageBubble(
                                 modifier = Modifier.size(16.dp),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
+                        }
+
+                        // Edit assistant response
+                        if (onEditAssistantMessage != null && streamingContent.isEmpty()) {
+                            IconButton(
+                                onClick = {
+                                    editedAssistantText = contentToCopyOrRead
+                                    isEditingAssistantMessage = true
+                                },
+                                modifier = Modifier.size(32.dp)
+                            ) {
+                                Icon(
+                                    Icons.Outlined.Edit,
+                                    contentDescription = stringResource(R.string.save),
+                                    modifier = Modifier.size(16.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
                         
                         // Regenerate button
