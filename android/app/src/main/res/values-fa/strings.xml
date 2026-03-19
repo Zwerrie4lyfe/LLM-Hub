@@ -829,5 +829,12 @@
     <string name="privacy_ads_title">حریم خصوصی و تبلیغات</string>
     <string name="privacy_ads_subtitle">مدیریت شخصی‌سازی تبلیغات و انتخاب‌های رضایت</string>
     <string name="export">صادر کردن</string>
+    <string name="home_section_tools">ابزارها</string>
+    <string name="home_section_utilities">ابزارهای کمکی</string>
+    <string name="feature_vibevoice">چت صوتی</string>
+    <string name="feature_vibevoice_desc">چت صوتی با هوش مصنوعی به‌صورت محلی</string>
+    <string name="chat_now">اکنون چت کنید</string>
 </resources>
+
+
 

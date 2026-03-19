@@ -4,10 +4,10 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -64,8 +64,6 @@ fun HomeScreen(
     onNavigateToPremium: () -> Unit = {},
     isPremium: Boolean = false
 ) {
-    val configuration = LocalConfiguration.current
-    val isLandscape = configuration.screenWidthDp > configuration.screenHeightDp
     val uriHandler = LocalUriHandler.current
     val context = LocalContext.current
     val preferences = remember { ThemePreferences(context) }
@@ -128,12 +126,21 @@ fun HomeScreen(
                 icon = Icons.Filled.AutoAwesome,
                 gradient = Pair(Color(0xFF8EC5FC), Color(0xFFE0C3FC)),
                 route = "creator_generation"
+            ),
+            FeatureCard(
+                title = R.string.feature_vibevoice,
+                description = R.string.feature_vibevoice_desc,
+                icon = Icons.Filled.GraphicEq,
+                gradient = Pair(Color(0xFF7BC6CC), Color(0xFF8A82FB)),
+                route = "vibevoice"
             )
         )
     }
-    
-    val startTime = remember { System.currentTimeMillis() }
 
+    val aiChatFeature = features.first { it.route == "chat" }
+    val toolsFeatures = features.filter { it.route in setOf("writing_aid", "translator", "transcriber", "image_generator") }
+    val utilityFeatures = features.filter { it.route in setOf("scam_detector", "vibe_coder", "creator_generation", "vibevoice") }
+    
     Scaffold(
         topBar = {
             TopAppBar(
@@ -251,12 +258,6 @@ fun HomeScreen(
                     }
                 }
             )
-        },
-        bottomBar = {
-            // Banner ad for free users — 320×50, anchored at the very bottom
-            if (!isPremium) {
-                BannerAd(modifier = Modifier.fillMaxWidth())
-            }
         }
     ) { paddingValues ->
         BoxWithConstraints(
@@ -264,63 +265,343 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Use BoxWithConstraints sizes for robust orientation and rotation handling
-            val isLandscapeLocal = maxWidth > maxHeight
+            val isLandscapeLayout = maxWidth > maxHeight
+            val isTabletLayout = minOf(maxWidth, maxHeight) >= 600.dp
+            val isPhoneLandscapeLayout = isLandscapeLayout && !isTabletLayout
 
-            // ── Column count ──────────────────────────────────────────────────────────
-            // Tablet/foldable landscape : 4 columns  (4×2 = 8 cards, all visible)
-            // Phone landscape            : 3 columns  (scrollable, ~6 visible)
-            // Foldable/tablet portrait   : 3 columns  (3×3 = 9 slots, 8 cards fit)
-            // Phone portrait             : 2 columns  (2×4 = 8 cards, all visible)
-            val columns = when {
-                isLandscapeLocal && maxWidth >= 600.dp -> 4   // tablet/foldable landscape
-                isLandscapeLocal                       -> 3   // phone landscape
-                !isLandscapeLocal && maxWidth >= 600.dp -> 3  // foldable/tablet portrait
-                else                                   -> 2   // phone portrait
+            val isTabletPortrait = isTabletLayout && !isLandscapeLayout
+            val isTabletLandscape = isTabletLayout && isLandscapeLayout
+
+            val horizontalPadding = when {
+                isPhoneLandscapeLayout -> 10.dp
+                isTabletLayout -> 24.dp
+                else -> 16.dp
+            }
+            val verticalPadding = when {
+                isPhoneLandscapeLayout -> 8.dp
+                isTabletLayout -> 20.dp
+                else -> 16.dp
+            }
+            val sectionSpacing = when {
+                isPhoneLandscapeLayout -> 8.dp
+                else -> 14.dp
+            }
+            val rowSpacing = when {
+                isPhoneLandscapeLayout -> 8.dp
+                else -> 12.dp
             }
 
-            // ── Rows to fit on-screen (drives card height calculation) ────────────────
-            // Phone portrait: 4 rows so 2×4 = 8 all visible
-            // Foldable/tablet portrait: 3 rows so 3×3 covers all 8
-            // Tablet/foldable landscape: 2 rows so 4×2 = 8 all visible
-            // Phone landscape: let it scroll naturally (null)
-            val rowsWanted: Int? = when {
-                isLandscapeLocal && maxWidth >= 600.dp  -> 2  // 4×2 all on-screen
-                isLandscapeLocal                        -> null // phone landscape, scrollable
-                !isLandscapeLocal && maxWidth >= 600.dp -> 3  // 3×3 all on-screen
-                else                                    -> 4  // phone portrait 2×4
+            val heroHeight = when {
+                isPhoneLandscapeLayout -> 90.dp
+                isTabletPortrait -> 224.dp
+                isTabletLandscape -> 156.dp
+                else -> 190.dp
             }
 
-            // ── Card height so all rows fit without scrolling ─────────────────────────
-            val contentPaddingVertical = 32.dp  // top(16) + bottom(16)
-            val cardHeight: Dp? = rowsWanted?.let { rows ->
-                val verticalSpacing = 16.dp * (rows - 1)
-                val totalSpacing = contentPaddingVertical + verticalSpacing
-                val calc = (maxHeight - totalSpacing) / rows
-                if (calc < 100.dp) 100.dp else calc
+            val toolsColumns = if (isLandscapeLayout) 4 else 2
+
+            val utilityColumns = when {
+                isLandscapeLayout -> 4
+                isTabletPortrait -> 3
+                maxWidth >= 430.dp -> 3
+                else -> 2
             }
 
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(columns),
-                contentPadding = PaddingValues(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.fillMaxSize()
+            val featureCardHeight = when {
+                isPhoneLandscapeLayout -> 72.dp
+                isTabletPortrait -> 118.dp
+                isTabletLandscape -> 96.dp
+                else -> 108.dp
+            }
+
+            val compactCards = isPhoneLandscapeLayout
+            val sectionTitleStyle = if (isPhoneLandscapeLayout) {
+                MaterialTheme.typography.titleLarge
+            } else {
+                MaterialTheme.typography.headlineSmall
+            }
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(horizontal = horizontalPadding, vertical = verticalPadding),
+                verticalArrangement = Arrangement.spacedBy(sectionSpacing)
             ) {
-
-                // Feature Cards
-                itemsIndexed(features) { index, feature ->
-                    val isLocked = !isPremium && feature.route in PREMIUM_ROUTES
-                    AnimatedFeatureCard(
-                        feature = feature,
-                        index = index,
-                        cardHeight = cardHeight,
-                        startTime = startTime,
-                        isLocked = isLocked,
+                item {
+                    HomeHeroCard(
+                        feature = aiChatFeature,
+                        cardHeight = heroHeight,
+                        compact = compactCards,
+                        isLocked = !isPremium && aiChatFeature.route in PREMIUM_ROUTES,
                         onClick = {
-                            if (isLocked) onNavigateToPremium()
-                            else onNavigateToFeature(feature.route)
+                            val isLocked = !isPremium && aiChatFeature.route in PREMIUM_ROUTES
+                            if (isLocked) onNavigateToPremium() else onNavigateToFeature(aiChatFeature.route)
                         }
+                    )
+                }
+
+                item {
+                    Text(
+                        text = stringResource(R.string.home_section_tools),
+                        style = sectionTitleStyle,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+
+                item {
+                    Column(verticalArrangement = Arrangement.spacedBy(rowSpacing)) {
+                        toolsFeatures.chunked(toolsColumns).forEach { rowFeatures ->
+                            Row(horizontalArrangement = Arrangement.spacedBy(rowSpacing), modifier = Modifier.fillMaxWidth()) {
+                                rowFeatures.forEach { feature ->
+                                    val isLocked = !isPremium && feature.route in PREMIUM_ROUTES
+                                    Box(modifier = Modifier.weight(1f)) {
+                                        SmallFeatureCard(
+                                            feature = feature,
+                                            cardHeight = featureCardHeight,
+                                            compact = compactCards,
+                                            isLocked = isLocked,
+                                            onClick = {
+                                                if (isLocked) onNavigateToPremium() else onNavigateToFeature(feature.route)
+                                            }
+                                        )
+                                    }
+                                }
+                                repeat((toolsColumns - rowFeatures.size).coerceAtLeast(0)) {
+                                    Spacer(modifier = Modifier.weight(1f))
+                                }
+                            }
+                        }
+                    }
+                }
+
+                item {
+                    Text(
+                        text = stringResource(R.string.home_section_utilities),
+                        style = sectionTitleStyle,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+
+                item {
+                    Column(verticalArrangement = Arrangement.spacedBy(rowSpacing)) {
+                        utilityFeatures.chunked(utilityColumns).forEach { rowFeatures ->
+                            Row(horizontalArrangement = Arrangement.spacedBy(rowSpacing), modifier = Modifier.fillMaxWidth()) {
+                                rowFeatures.forEach { feature ->
+                                    val isLocked = !isPremium && feature.route in PREMIUM_ROUTES
+                                    Box(modifier = Modifier.weight(1f)) {
+                                        SmallFeatureCard(
+                                            feature = feature,
+                                            cardHeight = featureCardHeight,
+                                            compact = compactCards,
+                                            isLocked = isLocked,
+                                            onClick = {
+                                                if (isLocked) onNavigateToPremium() else onNavigateToFeature(feature.route)
+                                            }
+                                        )
+                                    }
+                                }
+                                repeat((utilityColumns - rowFeatures.size).coerceAtLeast(0)) {
+                                    Spacer(modifier = Modifier.weight(1f))
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (!isPremium && !isLandscapeLayout) {
+                    item {
+                        BannerAd(modifier = Modifier.fillMaxWidth())
+                    }
+                }
+
+                item { Spacer(modifier = Modifier.height(6.dp)) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun HomeHeroCard(
+    feature: FeatureCard,
+    cardHeight: Dp,
+    compact: Boolean,
+    isLocked: Boolean,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(cardHeight)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(28.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.linearGradient(
+                        colors = listOf(
+                            feature.gradient.first.copy(alpha = if (isLocked) 0.45f else 1f),
+                            feature.gradient.second.copy(alpha = if (isLocked) 0.45f else 1f)
+                        )
+                    )
+                )
+                .padding(if (compact) 12.dp else 18.dp)
+        ) {
+            Column(
+                modifier = Modifier.align(Alignment.CenterStart),
+                verticalArrangement = Arrangement.spacedBy(if (compact) 6.dp else 10.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(if (compact) 8.dp else 12.dp)) {
+                    Box(
+                        modifier = Modifier
+                            .size(if (compact) 42.dp else 54.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(Color.White.copy(alpha = 0.28f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = feature.icon,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(if (compact) 24.dp else 30.dp)
+                        )
+                    }
+                    Text(
+                        text = stringResource(feature.title),
+                        style = if (compact) MaterialTheme.typography.headlineSmall else MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color.White,
+                        maxLines = 1
+                    )
+                }
+
+                Text(
+                    text = stringResource(feature.description),
+                    style = if (compact) MaterialTheme.typography.bodySmall else MaterialTheme.typography.bodyLarge,
+                    color = Color.White.copy(alpha = 0.92f),
+                    maxLines = if (compact) 1 else 2
+                )
+
+                Surface(
+                    shape = RoundedCornerShape(24.dp),
+                    color = Color.White.copy(alpha = 0.65f),
+                    modifier = Modifier.widthIn(min = if (compact) 124.dp else 160.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.chat_now),
+                        modifier = Modifier.padding(vertical = if (compact) 6.dp else 10.dp),
+                        textAlign = TextAlign.Center,
+                        style = if (compact) MaterialTheme.typography.titleSmall else MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF233E88)
+                    )
+                }
+            }
+
+            Icon(
+                imageVector = Icons.Filled.ChatBubbleOutline,
+                contentDescription = null,
+                tint = Color.White.copy(alpha = 0.28f),
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .size(if (compact) 72.dp else 120.dp)
+            )
+
+            if (isLocked) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .clip(RoundedCornerShape(bottomStart = 10.dp))
+                        .background(Color(0xFFFFD700))
+                        .padding(horizontal = 6.dp, vertical = 3.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Lock,
+                        contentDescription = stringResource(R.string.premium_locked_feature),
+                        tint = Color(0xFF1A0533),
+                        modifier = Modifier.size(14.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SmallFeatureCard(
+    feature: FeatureCard,
+    cardHeight: Dp,
+    compact: Boolean,
+    isLocked: Boolean,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(cardHeight)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.linearGradient(
+                        colors = listOf(
+                            feature.gradient.first.copy(alpha = if (isLocked) 0.45f else 0.95f),
+                            feature.gradient.second.copy(alpha = if (isLocked) 0.45f else 0.95f)
+                        )
+                    )
+                )
+                .padding(if (compact) 8.dp else 12.dp)
+        ) {
+            Column(
+                modifier = Modifier.fillMaxHeight(),
+                verticalArrangement = if (compact) Arrangement.spacedBy(4.dp) else Arrangement.spacedBy(8.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(if (compact) 28.dp else 40.dp)
+                        .clip(CircleShape)
+                        .background(Color.White.copy(alpha = 0.25f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = feature.icon,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(if (compact) 16.dp else 22.dp)
+                    )
+                }
+
+                Text(
+                    text = stringResource(feature.title),
+                    style = if (compact) MaterialTheme.typography.titleSmall else MaterialTheme.typography.titleLarge,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1
+                )
+            }
+
+            if (isLocked) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .clip(RoundedCornerShape(bottomStart = 10.dp))
+                        .background(Color(0xFFFFD700))
+                        .padding(horizontal = 6.dp, vertical = 3.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Lock,
+                        contentDescription = stringResource(R.string.premium_locked_feature),
+                        tint = Color(0xFF1A0533),
+                        modifier = Modifier.size(14.dp)
                     )
                 }
             }

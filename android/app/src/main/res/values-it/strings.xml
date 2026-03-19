@@ -823,5 +823,12 @@
     <string name="privacy_ads_title">Privacy e pubblicità</string>
     <string name="privacy_ads_subtitle">Gestisci la personalizzazione degli annunci e le tue scelte di consenso</string>
     <string name="export">Esporta</string>
+    <string name="home_section_tools">Strumenti</string>
+    <string name="home_section_utilities">Utilità</string>
+    <string name="feature_vibevoice">Chat vocale</string>
+    <string name="feature_vibevoice_desc">Chat vocale con IA in locale</string>
+    <string name="chat_now">Chatta ora</string>
 </resources>
+
+
 

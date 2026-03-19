@@ -800,5 +800,12 @@
     <string name="privacy_ads_title">Privacidad y anuncios</string>
     <string name="privacy_ads_subtitle">Gestiona la personalización de anuncios y tus elecciones de consentimiento</string>
     <string name="export">Exportar</string>
+    <string name="home_section_tools">Herramientas</string>
+    <string name="home_section_utilities">Utilidades</string>
+    <string name="feature_vibevoice">Chat de voz</string>
+    <string name="feature_vibevoice_desc">Chat de voz con IA local</string>
+    <string name="chat_now">Chatear ahora</string>
 </resources>
+
+
 

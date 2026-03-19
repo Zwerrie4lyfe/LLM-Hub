@@ -801,5 +801,12 @@
     <string name="privacy_ads_title">Конфиденциальность и реклама</string>
     <string name="privacy_ads_subtitle">Управление персонализацией рекламы и согласиями</string>
     <string name="export">Экспорт</string>
+    <string name="home_section_tools">Инструменты</string>
+    <string name="home_section_utilities">Утилиты</string>
+    <string name="feature_vibevoice">Голосовой чат</string>
+    <string name="feature_vibevoice_desc">Локальный голосовой чат с ИИ</string>
+    <string name="chat_now">Начать чат</string>
 </resources>
+
+
 

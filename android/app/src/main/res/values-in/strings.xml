@@ -831,5 +831,12 @@
     <string name="privacy_ads_title">Privasi &amp; Iklan</string>
     <string name="privacy_ads_subtitle">Kelola personalisasi iklan dan pilihan persetujuan Anda</string>
     <string name="export">Ekspor</string>
+    <string name="home_section_tools">Alat</string>
+    <string name="home_section_utilities">Utilitas</string>
+    <string name="feature_vibevoice">Obrolan suara</string>
+    <string name="feature_vibevoice_desc">Obrolan suara dengan AI secara lokal</string>
+    <string name="chat_now">Chat sekarang</string>
 </resources>
+
+
 

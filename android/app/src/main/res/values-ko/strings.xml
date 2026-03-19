@@ -829,5 +829,12 @@
     <string name="privacy_ads_title">개인정보 및 광고</string>
     <string name="privacy_ads_subtitle">광고 개인화 및 동의 선택 관리</string>
     <string name="export">내보내기</string>
+    <string name="home_section_tools">도구</string>
+    <string name="home_section_utilities">유틸리티</string>
+    <string name="feature_vibevoice">음성 채팅</string>
+    <string name="feature_vibevoice_desc">로컬 AI와 음성 채팅</string>
+    <string name="chat_now">지금 채팅</string>
 </resources>
+
+
 

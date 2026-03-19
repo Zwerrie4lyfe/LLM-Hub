@@ -833,5 +833,12 @@
     <string name="privacy_ads_title">Prywatność i reklamy</string>
     <string name="privacy_ads_subtitle">Zarządzaj personalizacją reklam i wyborami zgody</string>
     <string name="export">Eksportuj</string>
+    <string name="home_section_tools">Narzędzia</string>
+    <string name="home_section_utilities">Narzędzia pomocnicze</string>
+    <string name="feature_vibevoice">Czat głosowy</string>
+    <string name="feature_vibevoice_desc">Lokalny czat głosowy z AI</string>
+    <string name="chat_now">Czatuj teraz</string>
 </resources>
+
+
 

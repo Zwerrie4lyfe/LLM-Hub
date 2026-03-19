@@ -828,5 +828,12 @@
     <string name="privacy_ads_title">الخصوصية والإعلانات</string>
     <string name="privacy_ads_subtitle">إدارة تخصيص الإعلانات وخيارات الموافقة</string>
     <string name="export">تصدير</string>
+    <string name="home_section_tools">الأدوات</string>
+    <string name="home_section_utilities">الأدوات المساعدة</string>
+    <string name="feature_vibevoice">دردشة صوتية</string>
+    <string name="feature_vibevoice_desc">دردشة صوتية مع الذكاء الاصطناعي محليًا</string>
+    <string name="chat_now">ابدأ الدردشة</string>
 </resources>
+
+
 

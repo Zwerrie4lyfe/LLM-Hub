@@ -782,5 +782,12 @@
     <string name="privacy_ads_title">Privacidade e anúncios</string>
     <string name="privacy_ads_subtitle">Gerencie a personalização de anúncios e suas escolhas de consentimento</string>
     <string name="export">Exportar</string>
+    <string name="home_section_tools">Ferramentas</string>
+    <string name="home_section_utilities">Utilitários</string>
+    <string name="feature_vibevoice">Chat de voz</string>
+    <string name="feature_vibevoice_desc">Chat de voz com IA local</string>
+    <string name="chat_now">Conversar agora</string>
 </resources>
+
+
 

@@ -817,5 +817,12 @@
     <string name="privacy_ads_title">Confidentialité et publicités</string>
     <string name="privacy_ads_subtitle">Gérer la personnalisation des publicités et vos choix de consentement</string>
     <string name="export">Exporter</string>
+    <string name="home_section_tools">Outils</string>
+    <string name="home_section_utilities">Utilitaires</string>
+    <string name="feature_vibevoice">Chat vocal</string>
+    <string name="feature_vibevoice_desc">Chat vocal avec IA en local</string>
+    <string name="chat_now">Discuter maintenant</string>
 </resources>
+
+
 

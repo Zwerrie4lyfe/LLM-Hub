@@ -835,6 +835,13 @@
     <string name="no_response_produced">No response produced. (Possible: token limit or session reset). Tap Regenerate.</string>
     <string name="prompt_too_long">Prompt is too long. Please shorten your message and try again.</string>
     <string name="export">Export</string>
+    <string name="home_section_tools">Tools</string>
+    <string name="home_section_utilities">Utilities</string>
+    <string name="feature_vibevoice">VibeVoice</string>
+    <string name="feature_vibevoice_desc">Voice chat with AI locally</string>
+    <string name="chat_now">Chat Now</string>
 </resources>
+
+
 
 

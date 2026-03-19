@@ -828,5 +828,12 @@
     <string name="privacy_ads_title">פרטיות ומודעות</string>
     <string name="privacy_ads_subtitle">נהל את התאמה אישית של מודעות ובחירות הסכמה</string>
     <string name="export">ייצוא</string>
+    <string name="home_section_tools">כלים</string>
+    <string name="home_section_utilities">כלי עזר</string>
+    <string name="feature_vibevoice">צ׳אט קולי</string>
+    <string name="feature_vibevoice_desc">צ׳אט קולי עם בינה מלאכותית מקומית</string>
+    <string name="chat_now">צ׳אט עכשיו</string>
 </resources>
+
+
 

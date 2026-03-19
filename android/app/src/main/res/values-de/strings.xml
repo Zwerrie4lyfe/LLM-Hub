@@ -795,5 +795,12 @@
     <string name="privacy_ads_title">Datenschutz &amp; Werbung</string>
     <string name="privacy_ads_subtitle">Werbe-Personalisierung und Einwilligungen verwalten</string>
     <string name="export">Exportieren</string>
+    <string name="home_section_tools">Tools</string>
+    <string name="home_section_utilities">Dienstprogramme</string>
+    <string name="feature_vibevoice">Sprachchat</string>
+    <string name="feature_vibevoice_desc">Sprachchat mit KI lokal</string>
+    <string name="chat_now">Jetzt chatten</string>
 </resources>
+
+
 

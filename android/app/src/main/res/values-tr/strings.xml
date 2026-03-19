@@ -826,5 +826,12 @@
     <!-- Privacy &amp; Ads consent -->
     <string name="privacy_ads_title">Gizlilik ve Reklamlar</string>
     <string name="privacy_ads_subtitle">Reklam kişiselleştirme ve onay tercihlerini yönetin</string>    <string name="export">Dışa aktar</string>
+    <string name="home_section_tools">Araçlar</string>
+    <string name="home_section_utilities">Yardımcılar</string>
+    <string name="feature_vibevoice">Sesli sohbet</string>
+    <string name="feature_vibevoice_desc">Yapay zeka ile yerel sesli sohbet</string>
+    <string name="chat_now">Şimdi sohbet et</string>
 </resources>
+
+
 

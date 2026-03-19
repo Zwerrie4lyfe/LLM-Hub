@@ -826,5 +826,12 @@
     <string name="privacy_ads_title">プライバシーと広告</string>
     <string name="privacy_ads_subtitle">広告のパーソナライズと同意の選択を管理する</string>
     <string name="export">エクスポート</string>
+    <string name="home_section_tools">ツール</string>
+    <string name="home_section_utilities">ユーティリティ</string>
+    <string name="feature_vibevoice">音声チャット</string>
+    <string name="feature_vibevoice_desc">ローカルAIとの音声チャット</string>
+    <string name="chat_now">今すぐチャット</string>
 </resources>
+
+
 
