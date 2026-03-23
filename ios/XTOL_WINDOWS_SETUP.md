@@ -85,7 +85,7 @@ If you've done the one-time setup above, run:
 .\start_llm_hub.ps1
 ```
 
-**Note:** The script currently uses usbipd. For the iTunes/port-forward method, use the WSL commands directly instead of the script, or update the script to skip usbipd.
+The script automatically detects the repository root from its own location and sets the correct WSL path, so it works regardless of where the repo is cloned.
 
 ---
 
