@@ -175,7 +175,7 @@ struct ImageGeneratorScreen: View {
                     if !expandedPrompt.isEmpty {
                         VStack(alignment: .leading, spacing: 8) {
                             HStack {
-                                Text(settings.localized("image_generator_prompt_label") + " (Expanded)")
+                                Text(settings.localized("image_generator_expanded_label"))
                                     .font(.subheadline.weight(.semibold))
                                     .foregroundColor(.secondary)
                                 Spacer()
