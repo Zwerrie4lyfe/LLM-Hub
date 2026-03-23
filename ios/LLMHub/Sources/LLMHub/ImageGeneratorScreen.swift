@@ -134,7 +134,7 @@ struct ImageGeneratorScreen: View {
                     // Generate / Cancel button
                     if !modelLoaded {
                         Button { onNavigateToModels() } label: {
-                            Label("Load a model to expand prompts", systemImage: "arrow.down.circle")
+                            Label(settings.localized("writing_aid_no_model"), systemImage: "arrow.down.circle")
                                 .frame(maxWidth: .infinity)
                                 .padding()
                                 .background(Color.orange.opacity(0.15))

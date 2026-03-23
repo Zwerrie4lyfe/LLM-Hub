@@ -317,7 +317,7 @@ private struct LanguagePickerSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Done") { dismiss() }
+                    Button(AppSettings.shared.localized("done")) { dismiss() }
                 }
             }
         }

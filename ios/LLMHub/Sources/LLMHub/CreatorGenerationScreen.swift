@@ -286,9 +286,9 @@ struct CreatorGenerationScreen: View {
             Button(role: .destructive) {
                 deleteCreator(creator)
             } label: {
-                Text("Delete")
+                Text(settings.localized("delete"))
             }
-            Button("Cancel", role: .cancel) {}
+            Button(settings.localized("cancel"), role: .cancel) {}
         } message: { creator in
             Text(settings.localized("dialog_delete_creator_message"))
         }

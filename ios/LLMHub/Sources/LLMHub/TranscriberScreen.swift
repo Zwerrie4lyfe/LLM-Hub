@@ -183,7 +183,7 @@ struct TranscriberScreen: View {
                         HStack(spacing: 8) {
                             Image(systemName: "exclamationmark.triangle.fill")
                                 .foregroundColor(.orange)
-                            Text("Microphone access required. Please enable in Settings.")
+                            Text(settings.localized("transcriber_microphone_permission"))
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -334,7 +334,7 @@ enum SpeechTranscriber {
 
                 let request = SFSpeechURLRecognitionRequest(url: url)
                 request.shouldReportPartialResults = false
-                request.requiresOnDeviceRecognition = false
+                request.requiresOnDeviceRecognition = true
 
                 recognizer.recognitionTask(with: request) { result, error in
                     if let error {
