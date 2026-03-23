@@ -14,6 +14,13 @@ struct HomeScreen: View {
     var onNavigateToChat: () -> Void
     var onNavigateToModels: () -> Void
     var onNavigateToSettings: () -> Void
+    var onNavigateToWritingAid: () -> Void
+    var onNavigateToTranslator: () -> Void
+    var onNavigateToTranscriber: () -> Void
+    var onNavigateToScamDetector: () -> Void
+    var onNavigateToImageGenerator: () -> Void
+    var onNavigateToVibeCoder: () -> Void
+    var onNavigateToCreatorGeneration: () -> Void
     @State private var githubStars: Int? = nil
 
     var features: [FeatureCard] {
@@ -128,10 +135,17 @@ struct HomeScreen: View {
                     LazyVGrid(columns: columns, spacing: spacing) {
                         ForEach(features, id: \.route) { feature in
                             Button {
-                                if feature.route == "chat" {
-                                    onNavigateToChat()
+                                switch feature.route {
+                                case "chat":               onNavigateToChat()
+                                case "writing_aid":        onNavigateToWritingAid()
+                                case "translator":         onNavigateToTranslator()
+                                case "transcriber":        onNavigateToTranscriber()
+                                case "scam_detector":      onNavigateToScamDetector()
+                                case "image_generator":    onNavigateToImageGenerator()
+                                case "vibe_coder":         onNavigateToVibeCoder()
+                                case "creator_generation": onNavigateToCreatorGeneration()
+                                default:                   break
                                 }
-                                // Other routes: coming soon
                             } label: {
                                 FeatureCardView(feature: feature)
                                     .frame(width: cardWidth, height: cardHeight)
