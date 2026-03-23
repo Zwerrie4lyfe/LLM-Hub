@@ -20,5 +20,9 @@ if (-not $wslGateway) {
 }
 
 Write-Host "Starting xtool dev (build + install to iPhone)..." -ForegroundColor Magenta
-$bashCmd = "export USBMUXD_SOCKET_ADDRESS=`"`$(ip route list default | cut -d' ' -f3):27015`" && cd /mnt/c/Users/timmy/Downloads/LLM-Hub/ios/LLMHub && xtool dev"
+$driveLetter = $PSScriptRoot.Substring(0, 1).ToLower()
+$pathRest = $PSScriptRoot.Substring(2) -replace '\\', '/'
+$wslProjectRoot = "/mnt/$driveLetter$pathRest"
+$wslLLMHubDir = "$wslProjectRoot/ios/LLMHub"
+$bashCmd = "export USBMUXD_SOCKET_ADDRESS=`"`$(ip route list default | cut -d' ' -f3):27015`" && cd '$wslLLMHubDir' && xtool dev"
 wsl -- bash --login -c $bashCmd

@@ -123,8 +123,9 @@ fun CodeCanvasScreen(
                         // Sanitize and load HTML content
                         try {
                             val sanitizedHtml = sanitizeHtml(codeContent)
-                            // Use loadDataWithBaseURL so inline scripts execute correctly
-                            loadDataWithBaseURL(null, sanitizedHtml, "text/html", "utf-8", null)
+                            // Use "https://localhost/" as base URL so inline scripts and
+                            // origin-based APIs (localStorage, sessionStorage, etc.) work correctly
+                            loadDataWithBaseURL("https://localhost/", sanitizedHtml, "text/html", "utf-8", null)
                         } catch (e: Exception) {
                             hasError = true
                             errorMessage = e.message ?: "Failed to load content"
